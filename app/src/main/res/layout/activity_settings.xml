@@ -33,10 +33,11 @@
             <TextView
                 style="@style/SettingsItemText"
                 android:text="@string/theme"/>
+
             <Switch
                 android:id="@+id/switchtheme"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 

@@ -42,7 +42,7 @@ style="@style/RootLayout">
             android:maxLines="1"
             android:inputType="text"
             android:textColor="@color/black"
-            android:textColorHint="@color/icon_settings"
+            android:textColorHint="@color/search_hint"
             app:cornerRadius="8dp"
             />
 
