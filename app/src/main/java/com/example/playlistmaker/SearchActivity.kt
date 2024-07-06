@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 
 class SearchActivity : AppCompatActivity() {
 
@@ -25,21 +26,19 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val clearButton = findViewById<ImageView>(R.id.clearButton)
+
+        clearButton.isVisible = false
         inputView = findViewById(R.id.inputView)
 
         val simpleTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // пусто
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButton.visibility = clearButtonVisibility(s)
+                clearButtonVisibility(clearButton, s)
                 inputValue = s.toString()
             }
 
-            override fun afterTextChanged(s: Editable?) {
-                // пусто
-            }
+            override fun afterTextChanged(s: Editable?) {}
         }
 
         inputView?.addTextChangedListener(simpleTextWatcher)
@@ -63,16 +62,12 @@ class SearchActivity : AppCompatActivity() {
         inputView?.setText(inputValue)
     }
 
-    companion object {
-        const val STRING_VALUE = "PRODUCT_AMOUNT"
-        const val STRING_DEFAULT = ""
+    private fun clearButtonVisibility(view: View, s: CharSequence?) {
+        view.isVisible = !s.isNullOrEmpty()
     }
 
-    private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+    companion object {
+        private const val STRING_VALUE = "PRODUCT_AMOUNT"
+        private const val STRING_DEFAULT = ""
     }
 }
