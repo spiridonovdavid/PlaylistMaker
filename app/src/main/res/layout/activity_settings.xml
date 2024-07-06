@@ -1,115 +1,82 @@
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/dp_16">
+    style="@style/RootLayout">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <LinearLayout
+        android:layout_height="56dp"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:title="@string/button_settings"
-        app:navigationIcon="@drawable/arrow_back" />
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_height="24dp"
+            android:layout_width="24dp"
+            android:background="@drawable/arrow_back"
+            android:layout_marginEnd="12dp"/>
+
+        <TextView
+            style="@style/SettingsHeader"
+            android:text="@string/button_settings"/>
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@id/toolbar"
         android:layout_marginTop="@dimen/dp_24">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="@dimen/dp_10"
-            android:paddingBottom="@dimen/dp_10"
-            android:gravity="center_vertical">
-
+            style="@style/SettingsItem">
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/theme"
-                android:textSize="@dimen/sp_18"
-                android:textColor="@color/black"/>
-
+                style="@style/SettingsItemText"
+                android:text="@string/theme"/>
             <Switch
+                android:id="@+id/switchtheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingTop="@dimen/dp_10"
-            android:paddingBottom="@dimen/dp_10"
-            android:layout_marginTop="@dimen/dp_24">
+            android:id="@+id/share_btn"
+            style="@style/SettingsItem">
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/share"
-                android:textSize="@dimen/sp_18"
-                android:textColor="@color/black"/>
+                style="@style/SettingsItemText"
+                android:text="@string/share"/>
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/WrapContent"
                 app:srcCompat="@drawable/share"/>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingTop="@dimen/dp_10"
-            android:paddingBottom="@dimen/dp_10"
-            android:layout_marginTop="@dimen/dp_24">
+            android:id="@+id/support_btn"
+            style="@style/SettingsItem">
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/support"
-                android:textSize="@dimen/sp_18"
-                android:textColor="@color/black"/>
+                style="@style/SettingsItemText"
+                android:text="@string/support"/>
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/WrapContent"
                 app:srcCompat="@drawable/support"/>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingTop="@dimen/dp_10"
-            android:paddingBottom="@dimen/dp_10"
-            android:layout_marginTop="@dimen/dp_24">
-
+            android:id="@+id/policy_btn"
+            style="@style/SettingsItem">
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/policy"
-                android:textSize="@dimen/sp_18"
-                android:textColor="@color/black"/>
-
+                style="@style/SettingsItemText"
+                android:text="@string/policy"/>
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/WrapContent"
                 app:srcCompat="@drawable/policy"
                 android:paddingHorizontal="6dp"/>
-
         </LinearLayout>
 
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

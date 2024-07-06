@@ -1,6 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+style="@style/RootLayout">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+<LinearLayout
+    android:layout_height="56dp"
+    android:layout_width="match_parent"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/back"
+        android:layout_height="24dp"
+        android:layout_width="24dp"
+        android:background="@drawable/arrow_back"
+        android:layout_marginEnd="12dp"/>
+
+    <TextView
+        style="@style/SettingsHeader"
+        android:text="@string/button_search"/>
+
+</LinearLayout>
+
+
+    <FrameLayout
+        android:layout_height="36dp"
+        android:layout_width="match_parent"
+        android:paddingEnd="10dp"
+        android:background="@drawable/input_borderradius"
+        android:layout_marginTop="16dp">
+
+        <EditText
+            android:id="@+id/inputView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/search_input"
+            android:drawableStart="@drawable/search_icon"
+            android:drawablePadding="8dp"
+            android:hint="@string/button_search"
+            android:layout_gravity="center"
+            android:paddingHorizontal="12dp"
+            android:maxLines="1"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textColorHint="@color/icon_settings"
+            app:cornerRadius="8dp"
+            />
+
+        <ImageButton
+            android:id="@+id/clearButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="0dp"
+            android:background="@color/search_input"
+            android:src="@drawable/close"
+            android:layout_gravity="end|center_vertical"/>
+    </FrameLayout>
+</LinearLayout>
