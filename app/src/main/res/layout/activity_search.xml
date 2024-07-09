@@ -55,4 +55,11 @@ style="@style/RootLayout">
             android:src="@drawable/close"
             android:layout_gravity="end|center_vertical"/>
     </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/trackList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/dp_16"/>
+
 </LinearLayout>
