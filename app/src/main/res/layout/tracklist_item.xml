@@ -59,8 +59,8 @@
                 android:layout_weight="1"/>
 
             <ImageView
-                android:layout_width="3dp"
-                android:layout_height="3dp"
+                android:layout_width="@dimen/dp_3"
+                android:layout_height="@dimen/dp_3"
                 android:layout_gravity="center"
                 android:src="@drawable/ellipse"
                 app:tint="@color/icon_settings"

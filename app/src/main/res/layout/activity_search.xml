@@ -10,8 +10,8 @@ style="@style/RootLayout">
 
     <ImageView
         android:id="@+id/back"
-        android:layout_height="24dp"
-        android:layout_width="24dp"
+        android:layout_height="@dimen/dp_24"
+        android:layout_width="@dimen/dp_24"
         android:background="@drawable/arrow_back"
         android:layout_marginEnd="12dp"/>
 
@@ -48,8 +48,8 @@ style="@style/RootLayout">
 
         <ImageButton
             android:id="@+id/clearButton"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="@dimen/dp_36"
+            android:layout_height="@dimen/dp_36"
             android:layout_marginEnd="0dp"
             android:background="@color/search_input"
             android:src="@drawable/close"
