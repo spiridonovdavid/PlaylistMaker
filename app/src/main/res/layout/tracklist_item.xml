@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:layout_width="@dimen/dp_45"
         android:layout_height="@dimen/dp_45"
-        android:layout_marginStart="13dp"
+
         android:layout_marginTop="@dimen/dp_8"
         android:layout_marginBottom="@dimen/dp_8"
         android:scaleType="centerCrop"/>
@@ -85,11 +85,11 @@
         android:id="@+id/track_btn"
         android:layout_width="@dimen/dp_8"
         android:layout_height="14dp"
-        android:layout_marginStart="@dimen/dp_16"
         android:layout_gravity="center"
-        android:layout_marginEnd="@dimen/dp_20"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginEnd="@dimen/dp_8"
+        android:scaleType="centerCrop"
         android:src="@drawable/arrow_forward"
-        app:tint="@color/icon_settings"
-        android:scaleType="centerCrop"/>
+        app:tint="@color/icon_settings" />
 
 </LinearLayout>
