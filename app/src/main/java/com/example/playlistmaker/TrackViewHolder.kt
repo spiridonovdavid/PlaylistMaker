@@ -30,7 +30,7 @@ class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)  {
             .into(albumImage)
     }
 
-    fun dpToPx(dp: Float, context: Context): Int {
+    private fun dpToPx(dp: Float, context: Context): Int {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             dp,
