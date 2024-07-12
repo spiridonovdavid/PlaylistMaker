@@ -8,4 +8,5 @@
     <color name="icon_settings">#FFFFFF</color>
     <color name="search_input">#FFFFFF</color>
     <color name="search_hint">#000000</color>
+    <color name="textcolor">#FFFFFF</color>
 </resources>
