@@ -34,8 +34,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var errorImage: ImageView
     private lateinit var errorText: TextView
     private lateinit var buttonUpdate: Button
-    private var show = false
-    private var network = true
     private var tracks: MutableList<Track>? = mutableListOf()
     private var baseUrlITunes = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
