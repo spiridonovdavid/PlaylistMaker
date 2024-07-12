@@ -1,19 +1,24 @@
 package com.example.playlistmaker
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.Track
-import com.practicum.playlistmaker.TrackAdapter
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 class SearchActivity : AppCompatActivity() {
@@ -21,10 +26,36 @@ class SearchActivity : AppCompatActivity() {
     private var inputView: EditText? = null
     private var inputValue: String = ""
     private var recycler: RecyclerView? = null
+    private lateinit var errorLayout: LinearLayout
+    private lateinit var errorImage: ImageView
+    private lateinit var errorText: TextView
+    private lateinit var buttonUpdate: Button
+    private var tracks: MutableList<Track>? = mutableListOf()
+    private var baseUrlITunes = "https://itunes.apple.com"
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(baseUrlITunes)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    private val iTunesApi = retrofit.create(ItunesApi::class.java)
+
+    private var hasError = false
+    private var isNetworkError = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        inputView = findViewById(R.id.inputView)
+        recycler = findViewById(R.id.trackList)
+        errorLayout = findViewById(R.id.error_layout)
+        errorImage = findViewById(R.id.error_image)
+        errorText = findViewById(R.id.error_text)
+        buttonUpdate = findViewById(R.id.button_update)
+
+        buttonUpdate.setOnClickListener{
+            initSearch()
+            clearError()
+        }
 
         val backButton = findViewById<View>(R.id.back)
         backButton.setOnClickListener {
@@ -32,17 +63,22 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val clearButton = findViewById<ImageView>(R.id.clearButton)
-
         clearButton.isVisible = false
-        inputView = findViewById(R.id.inputView)
-
-        recycler = findViewById(R.id.trackList)
+        clearButton.setOnClickListener {
+            inputView?.setText("")
+            val hideKeyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            hideKeyboard.hideSoftInputFromWindow(inputView?.windowToken, 0)
+            inputView?.clearFocus()
+            clearAdapter()
+            errorLayout.isVisible = false
+            hasError = false
+        }
 
         val simpleTextWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButtonVisibility(clearButton, s)
+                setButtonVisibility(clearButton, s)
                 inputValue = s.toString()
             }
 
@@ -52,66 +88,112 @@ class SearchActivity : AppCompatActivity() {
         inputView?.addTextChangedListener(simpleTextWatcher)
 
         recycler?.layoutManager = LinearLayoutManager(this)
-        recycler?.adapter = TrackAdapter(songList)
-
-        clearButton.setOnClickListener {
-            inputView?.setText("")
-            val hideKeyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            hideKeyboard.hideSoftInputFromWindow(inputView?.windowToken, 0)
-            inputView?.clearFocus()
+        inputView?.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                initSearch()
+                true
+            }
+            false
         }
+    }
+
+    private fun showNotFoundError(){
+        errorLayout.isVisible = true
+        recycler?.isVisible = false
+        clearAdapter()
+        hasError = true
+        isNetworkError = true
+        buttonUpdate.isVisible = false
+        errorText.setText(R.string.error_not_found)
+        errorImage.setImageResource(R.drawable.error_notfound)
+        isNetworkError = true
+    }
+
+    private fun showNetworkError(){
+        errorLayout.isVisible = true
+        recycler?.isVisible = false
+        clearAdapter()
+        hasError = true
+        isNetworkError = true
+        buttonUpdate.isVisible = true
+        errorText.setText(R.string.error_internet)
+        errorImage.setImageResource(R.drawable.error_internet)
+        isNetworkError = false
+    }
+
+    private fun clearError() {
+        hasError = false
+        isNetworkError = true
+        errorLayout.isVisible = false
+        recycler?.isVisible = true
+    }
+
+    private fun initSearch() {
+        iTunesApi.search(inputValue).enqueue(object : retrofit2.Callback<ItunesDataModel> {
+            override fun onResponse(call: retrofit2.Call<ItunesDataModel>, response: retrofit2.Response<ItunesDataModel>) {
+                if (response.isSuccessful) {
+                    tracks = response.body()?.results
+                    if (!tracks.isNullOrEmpty()) {
+                        recycler?.adapter = TrackAdapter(tracks!!)
+                        clearError()
+                    } else {
+                        showNotFoundError()
+                    }
+                } else {
+                    showNetworkError()
+                }
+
+            }
+
+            override fun onFailure(call: retrofit2.Call<ItunesDataModel>, t: Throwable) {
+                showNetworkError()
+            }
+        })
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun clearAdapter() {
+        tracks?.clear()
+        recycler?.adapter?.notifyDataSetChanged()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(STRING_VALUE, inputValue)
+        outState.putParcelableArrayList(SEARCH_RESULTS, ArrayList(tracks))
+        outState.putBoolean(HAS_ERROR, hasError)
+        outState.putBoolean(IS_NETWORK_ERROR, isNetworkError)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         inputValue = savedInstanceState.getString(STRING_VALUE, STRING_DEFAULT)
         inputView?.setText(inputValue)
+
+        tracks = savedInstanceState.getParcelableArrayList(SEARCH_RESULTS)
+        hasError = savedInstanceState.getBoolean(HAS_ERROR, false)
+        isNetworkError = savedInstanceState.getBoolean(IS_NETWORK_ERROR, true)
+
+        if(hasError && isNetworkError) {
+            showNotFoundError()
+        } else if(hasError && !isNetworkError) {
+            showNetworkError()
+        } else {
+            recycler?.adapter = TrackAdapter(tracks ?: ArrayList())
+            clearError()
+        }
     }
 
-    private fun clearButtonVisibility(view: View, s: CharSequence?) {
+
+    private fun setButtonVisibility(view: View, s: CharSequence?) {
         view.isVisible = !s.isNullOrEmpty()
     }
 
     companion object {
-        private const val STRING_VALUE = "PRODUCT_AMOUNT"
+        private const val STRING_VALUE = "SEARCH_QUERY"
         private const val STRING_DEFAULT = ""
-        val songList: ArrayList<Track> = arrayListOf(
-            Track(
-                "Smells Like Teen Spirit",
-                "Nirvana",
-                "5:01",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Billie Jean",
-                "Michael Jackson",
-                "4:35",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Stayin' Alive",
-                "Bee Gees",
-                "4:10",
-                "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Whole Lotta Love",
-                "Led Zeppelin",
-                "5:33",
-                "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Sweet Child O'Mine",
-                "Guns N' Roses",
-                "5:03",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
-            )
-        )
-
+        private const val SEARCH_RESULTS = "SEARCH_RESULTS"
+        private const val HAS_ERROR = "HAS_ERROR"
+        private const val IS_NETWORK_ERROR = "IS_NETWORK_ERROR"
     }
 }

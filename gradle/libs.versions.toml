@@ -13,6 +13,7 @@ glide = "4.16.0"
 gson = "2.11.0"
 retrofit = "2.9.0"
 convertergson = "2.9.0"
+parcelize = "2.0.20-Beta2"
 
 
 [libraries]
@@ -31,6 +32,7 @@ convertergson = { group = "com.squareup.retrofit2", name = "converter-gson", ver
 
 
 [plugins]
+kotlin-parcelize = { id = "org.jetbrains.kotlin.android", version.ref = "parcelize" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
