@@ -17,10 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.ItunesApi
-import com.practicum.playlistmaker.ItunesDataModel
-import com.practicum.playlistmaker.Track
-import com.practicum.playlistmaker.TrackAdapter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -58,7 +54,7 @@ class SearchActivity : AppCompatActivity() {
 
         buttonUpdate.setOnClickListener{
             initSearch()
-            showError(false, true)
+            clearError()
         }
 
         val backButton = findViewById<View>(R.id.back)
@@ -82,7 +78,7 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButtonVisibility(clearButton, s)
+                setButtonVisibility(clearButton, s)
                 inputValue = s.toString()
             }
 
@@ -101,31 +97,35 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun showError(show: Boolean, network: Boolean) {
-        if (show) {
-            errorLayout.isVisible = true
-            recycler?.isVisible = false
-            clearAdapter()
-            hasError = true
-            isNetworkError = true
-            if (network) {
-                buttonUpdate.isVisible = false
-                errorText.setText(R.string.error_not_found)
-                errorImage.setImageResource(R.drawable.error_notfound)
-                isNetworkError = true
-            } else {
-                buttonUpdate.isVisible = true
-                errorText.setText(R.string.error_internet)
-                errorImage.setImageResource(R.drawable.error_internet)
-                isNetworkError = false
-            }
+    private fun showNotFoundError(){
+        errorLayout.isVisible = true
+        recycler?.isVisible = false
+        clearAdapter()
+        hasError = true
+        isNetworkError = true
+        buttonUpdate.isVisible = false
+        errorText.setText(R.string.error_not_found)
+        errorImage.setImageResource(R.drawable.error_notfound)
+        isNetworkError = true
+    }
 
-        } else {
-            hasError = false
-            isNetworkError = true
-            errorLayout.isVisible = false
-            recycler?.isVisible = true
-        }
+    private fun showNetworkError(){
+        errorLayout.isVisible = true
+        recycler?.isVisible = false
+        clearAdapter()
+        hasError = true
+        isNetworkError = true
+        buttonUpdate.isVisible = true
+        errorText.setText(R.string.error_internet)
+        errorImage.setImageResource(R.drawable.error_internet)
+        isNetworkError = false
+    }
+
+    private fun clearError() {
+        hasError = false
+        isNetworkError = true
+        errorLayout.isVisible = false
+        recycler?.isVisible = true
     }
 
     private fun initSearch() {
@@ -133,21 +133,20 @@ class SearchActivity : AppCompatActivity() {
             override fun onResponse(call: retrofit2.Call<ItunesDataModel>, response: retrofit2.Response<ItunesDataModel>) {
                 if (response.isSuccessful) {
                     tracks = response.body()?.results
-                    if (tracks != null) {
-                        if (tracks!!.isNotEmpty()) {
-                            recycler?.adapter = TrackAdapter(tracks!!)
-                            showError(false, true)
-                        } else {
-                            showError(true, true)
-                        }
+                    if (!tracks.isNullOrEmpty()) {
+                        recycler?.adapter = TrackAdapter(tracks!!)
+                        clearError()
+                    } else {
+                        showNotFoundError()
                     }
                 } else {
-                    showError(true, false)
+                    showNetworkError()
                 }
+
             }
 
             override fun onFailure(call: retrofit2.Call<ItunesDataModel>, t: Throwable) {
-                showError(true, false)
+                showNetworkError()
             }
         })
     }
@@ -175,16 +174,18 @@ class SearchActivity : AppCompatActivity() {
         hasError = savedInstanceState.getBoolean(HAS_ERROR, false)
         isNetworkError = savedInstanceState.getBoolean(IS_NETWORK_ERROR, true)
 
-        if (hasError) {
-            showError(true, isNetworkError)
+        if(hasError && isNetworkError) {
+            showNotFoundError()
+        } else if(hasError && !isNetworkError) {
+            showNetworkError()
         } else {
-            recycler?.adapter = TrackAdapter(tracks ?: mutableListOf())
-            showError(false, true)
+            recycler?.adapter = TrackAdapter(tracks ?: ArrayList())
+            clearError()
         }
     }
 
 
-    private fun clearButtonVisibility(view: View, s: CharSequence?) {
+    private fun setButtonVisibility(view: View, s: CharSequence?) {
         view.isVisible = !s.isNullOrEmpty()
     }
 

@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -36,7 +35,6 @@ class SettingsActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-
         val shareButton = findViewById<View>(R.id.share_btn)
         shareButton.setOnClickListener {
             val message = getString(R.string.share_text)
@@ -45,7 +43,6 @@ class SettingsActivity : AppCompatActivity() {
             shareIntent.putExtra(Intent.EXTRA_TEXT, message)
             startActivity(shareIntent)
         }
-
 
         val supportButton = findViewById<View>(R.id.support_btn)
         supportButton.setOnClickListener {
@@ -66,12 +63,6 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.policy_text))))
         }
 
-
-
-
     }
-
-
-
 
 }
