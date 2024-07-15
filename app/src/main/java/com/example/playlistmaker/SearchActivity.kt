@@ -30,9 +30,9 @@ class SearchActivity : AppCompatActivity() {
     private var errorImage: ImageView? = null
     private var errorText: TextView? = null
     private var buttonUpdate: Button? = null
-    private var historyAdapter: TrackAdapter? = null
     private var historyText: TextView? = null
     private var historyClear: Button? = null
+    private val emptyList: MutableList<Track> = mutableListOf()
 
     private var historyTrack: MutableList<Track>? = mutableListOf()
 
@@ -178,7 +178,7 @@ class SearchActivity : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun clearAdapter() {
-        tracks?.clear()
+        recycler?.adapter = TrackAdapter(emptyList)
         recycler?.adapter?.notifyDataSetChanged()
     }
 
