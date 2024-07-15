@@ -23,13 +23,19 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
-    private var inputView: EditText? = null
+    private var searchInput: EditText? = null
     private var inputValue: String = ""
     private var recycler: RecyclerView? = null
-    private lateinit var errorLayout: LinearLayout
-    private lateinit var errorImage: ImageView
-    private lateinit var errorText: TextView
-    private lateinit var buttonUpdate: Button
+    private var errorLayout: LinearLayout? = null
+    private var errorImage: ImageView? = null
+    private var errorText: TextView? = null
+    private var buttonUpdate: Button? = null
+    private var historyAdapter: TrackAdapter? = null
+    private var historyText: TextView? = null
+    private var historyClear: Button? = null
+
+    private var historyTrack: MutableList<Track>? = mutableListOf()
+
     private var tracks: MutableList<Track>? = mutableListOf()
     private var baseUrlITunes = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
@@ -45,16 +51,23 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        inputView = findViewById(R.id.inputView)
+        searchInput = findViewById(R.id.searchInput)
         recycler = findViewById(R.id.trackList)
         errorLayout = findViewById(R.id.error_layout)
         errorImage = findViewById(R.id.error_image)
         errorText = findViewById(R.id.error_text)
         buttonUpdate = findViewById(R.id.button_update)
+        historyText = findViewById(R.id.text_history)
+        historyClear = findViewById(R.id.button_history_clear)
 
-        buttonUpdate.setOnClickListener{
+        buttonUpdate?.setOnClickListener {
             initSearch()
             clearError()
+        }
+
+        historyClear?.setOnClickListener {
+            clearHistory((applicationContext as App))
+            hideHistoryElements()
         }
 
         val backButton = findViewById<View>(R.id.back)
@@ -65,13 +78,18 @@ class SearchActivity : AppCompatActivity() {
         val clearButton = findViewById<ImageView>(R.id.clearButton)
         clearButton.isVisible = false
         clearButton.setOnClickListener {
-            inputView?.setText("")
-            val hideKeyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            hideKeyboard.hideSoftInputFromWindow(inputView?.windowToken, 0)
-            inputView?.clearFocus()
-            clearAdapter()
-            errorLayout.isVisible = false
+            hideKeyboard()
+            searchInput?.setText("")
+            searchInput?.clearFocus()
+            errorLayout?.isVisible = false
             hasError = false
+            clearAdapter()
+
+        }
+
+        searchInput?.setOnFocusChangeListener { view, hasFocus ->
+            val historyActive = hasFocus && searchInput!!.text.isEmpty()
+            showHistory(historyActive)
         }
 
         val simpleTextWatcher = object : TextWatcher {
@@ -80,57 +98,64 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 setButtonVisibility(clearButton, s)
                 inputValue = s.toString()
+                showHistory(searchInput?.hasFocus() == true && s.isNullOrEmpty())
             }
 
             override fun afterTextChanged(s: Editable?) {}
         }
 
-        inputView?.addTextChangedListener(simpleTextWatcher)
+        searchInput?.addTextChangedListener(simpleTextWatcher)
 
         recycler?.layoutManager = LinearLayoutManager(this)
-        inputView?.setOnEditorActionListener { _, actionId, _ ->
+        searchInput?.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 initSearch()
+                hideHistoryElements()
                 true
             }
             false
         }
     }
 
-    private fun showNotFoundError(){
-        errorLayout.isVisible = true
+    private fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(searchInput?.windowToken, 0)
+    }
+
+    private fun showNotFoundError() {
+        errorLayout?.isVisible = true
         recycler?.isVisible = false
-        clearAdapter()
         hasError = true
-        isNetworkError = true
-        buttonUpdate.isVisible = false
-        errorText.setText(R.string.error_not_found)
-        errorImage.setImageResource(R.drawable.error_notfound)
+        buttonUpdate?.isVisible = false
+        errorText?.setText(R.string.error_not_found)
+        errorImage?.setImageResource(R.drawable.error_notfound)
         isNetworkError = true
     }
 
-    private fun showNetworkError(){
-        errorLayout.isVisible = true
+    private fun showNetworkError() {
+        errorLayout?.isVisible = true
         recycler?.isVisible = false
-        clearAdapter()
         hasError = true
         isNetworkError = true
-        buttonUpdate.isVisible = true
-        errorText.setText(R.string.error_internet)
-        errorImage.setImageResource(R.drawable.error_internet)
+        buttonUpdate?.isVisible = true
+        errorText?.setText(R.string.error_internet)
+        errorImage?.setImageResource(R.drawable.error_internet)
         isNetworkError = false
     }
 
     private fun clearError() {
         hasError = false
         isNetworkError = true
-        errorLayout.isVisible = false
+        errorLayout?.isVisible = false
         recycler?.isVisible = true
     }
 
     private fun initSearch() {
         iTunesApi.search(inputValue).enqueue(object : retrofit2.Callback<ItunesDataModel> {
-            override fun onResponse(call: retrofit2.Call<ItunesDataModel>, response: retrofit2.Response<ItunesDataModel>) {
+            override fun onResponse(
+                call: retrofit2.Call<ItunesDataModel>,
+                response: retrofit2.Response<ItunesDataModel>
+            ) {
                 if (response.isSuccessful) {
                     tracks = response.body()?.results
                     if (!tracks.isNullOrEmpty()) {
@@ -168,15 +193,15 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         inputValue = savedInstanceState.getString(STRING_VALUE, STRING_DEFAULT)
-        inputView?.setText(inputValue)
+        searchInput?.setText(inputValue)
 
         tracks = savedInstanceState.getParcelableArrayList(SEARCH_RESULTS)
         hasError = savedInstanceState.getBoolean(HAS_ERROR, false)
         isNetworkError = savedInstanceState.getBoolean(IS_NETWORK_ERROR, true)
 
-        if(hasError && isNetworkError) {
+        if (hasError && isNetworkError) {
             showNotFoundError()
-        } else if(hasError && !isNetworkError) {
+        } else if (hasError && !isNetworkError) {
             showNetworkError()
         } else {
             recycler?.adapter = TrackAdapter(tracks ?: ArrayList())
@@ -187,6 +212,39 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setButtonVisibility(view: View, s: CharSequence?) {
         view.isVisible = !s.isNullOrEmpty()
+    }
+
+    private fun adapterInit(adapterListTracks: MutableList<Track>?) {
+        clearAdapter()
+        tracks = adapterListTracks
+        recycler?.adapter = TrackAdapter(tracks!!)
+        recycler?.isVisible = true
+    }
+
+    private fun showHistory(isActive: Boolean) {
+
+        if (isActive) {
+
+            historyTrack = getHistorySearch((applicationContext as App))
+
+            if (historyTrack?.isNotEmpty() == true) {
+                historyText?.isVisible = true
+                historyClear?.isVisible = true
+                adapterInit(historyTrack)
+            } else {
+                hideHistoryElements()
+            }
+
+        } else {
+            hideHistoryElements()
+        }
+
+    }
+
+    private fun hideHistoryElements() {
+        historyText?.isVisible = false
+        historyClear?.isVisible = false
+        clearAdapter()
     }
 
     companion object {

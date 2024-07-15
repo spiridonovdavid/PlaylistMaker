@@ -30,14 +30,13 @@
 
         <LinearLayout
             style="@style/SettingsItem">
-            <TextView
-                style="@style/SettingsItemText"
-                android:text="@string/theme"/>
 
-            <Switch
+            <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchtheme"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                style="@style/SettingsItemText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/theme" />
 
         </LinearLayout>
 
