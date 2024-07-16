@@ -33,9 +33,7 @@ class SearchActivity : AppCompatActivity() {
     private var historyText: TextView? = null
     private var historyClear: Button? = null
     private val emptyList: MutableList<Track> = mutableListOf()
-
     private var historyTrack: MutableList<Track>? = mutableListOf()
-
     private var tracks: MutableList<Track>? = mutableListOf()
     private var baseUrlITunes = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
