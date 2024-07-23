@@ -10,4 +10,6 @@
     <color name="search_hint">#000000</color>
     <color name="textcolor">#FFFFFF</color>
     <color name="whitetoblack">#000000</color>
+    <color name="textblacktowhite">#FFFFFF</color>
+    <color name="labelcolor">#AEAFB4</color>
 </resources>

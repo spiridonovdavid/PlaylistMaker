@@ -17,6 +17,10 @@
     <string name="button_update">Обновить</string>
     <string name="history_text">Вы смотрели</string>
     <string name="clear_history">Очистить историю</string>
-
-
+    <string name="albumcover_desc">Обложка альбома</string>
+    <string name="duration_label">Длительность</string>
+    <string name="album_label">Альбом</string>
+    <string name="year_label">Год</string>
+    <string name="genre_label">Жанр</string>
+    <string name="country_label">Страна</string>
 </resources>
