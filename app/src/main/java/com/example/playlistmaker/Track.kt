@@ -10,6 +10,10 @@ data class Track(
     val artistName: String,
     @SerializedName("trackTimeMillis") var trackTime: Int,
     val artworkUrl100: String,
+    val collectionName: String,
+    val releaseDate: String,
+    val primaryGenreName: String,
+    val country: String,
     val trackId: Long
 ) : Parcelable {
     var isHistory: Boolean = false

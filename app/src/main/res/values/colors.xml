@@ -10,4 +10,7 @@
     <color name="search_hint">#AEAFB4</color>
     <color name="textcolor">#000000</color>
     <color name="whitetoblack">#ffffff</color>
+    <color name="textblacktowhite">#1A1B22</color>
+    <color name="labelcolor">#AEAFB4</color>
+
 </resources>
