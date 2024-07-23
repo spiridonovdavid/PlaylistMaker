@@ -25,7 +25,7 @@ class TrackAdapter(private var trackList: MutableList<Track>) : RecyclerView.Ada
 
             val json = Gson().toJson(trackList[position])
             val initIntent = Intent(holder.itemView.context, PlayerActivity::class.java)
-            initIntent.putExtra("TrackData", json)
+            initIntent.putExtra(TRACK_DATA, json)
             holder.itemView.context.startActivity(initIntent)
 
             if (trackList[position].isHistory) {
