@@ -101,7 +101,6 @@ class PlayerActivity : AppCompatActivity() {
 
         if(track?.previewUrl == null){
             Toast.makeText(this, "@string/nopreivewurl", Toast.LENGTH_SHORT).show()
-            println(track?.previewUrl)
         }
         preparePlayer(track?.previewUrl)
         buttonPlay.setOnClickListener {
