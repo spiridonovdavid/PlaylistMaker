@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.icu.text.SimpleDateFormat
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
@@ -8,7 +9,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.google.gson.Gson
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
@@ -47,38 +47,40 @@ class PlayerActivity : AppCompatActivity() {
         genreValue = findViewById(R.id.genreValue)
         trackCountry = findViewById(R.id.countryValue)
 
-        val intentState  = getIntent().getExtras();
-        val trackData = intentState?.getString(TRACK_DATA)
-        val track = Gson().fromJson(trackData, Track::class.java)
+        val track = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra("TRACK_DATA", Track::class.java)
+        } else {
+            intent.getParcelableExtra("TRACK_DATA")
+        }
 
         backButton.setOnClickListener{
             finish()
         }
 
         Glide.with(this)
-            .load(track.artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg"))
+            .load(track?.artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg"))
             .placeholder(R.drawable.placeholderplayer)
             .centerCrop()
             .transform(RoundedCorners(dpToPx(8f, this)))
             .into(albumImage)
 
-        trackName.text = track.trackName
-        artistName.text = track.artistName
+        trackName.text = track?.trackName
+        artistName.text = track?.artistName
 
-        if(track.collectionName?.isEmpty() == true){
+        if(track?.collectionName?.isEmpty() == true){
             albumLabel.isVisible = false
             albumValue.isVisible = false
         }else{
             albumLabel.isVisible = true
             albumValue.isVisible = true
-            albumValue.text = track.collectionName
+            albumValue.text = track?.collectionName
         }
 
         durationPlaying.text = "0:00"
-        trackDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTime)
-        yearValue.text = track.releaseDate.substring(0,4)
-        genreValue.text = track.primaryGenreName
-        trackCountry.text = track.country
+        trackDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track?.trackTime)
+        yearValue.text = track?.releaseDate?.substring(0,4)
+        genreValue.text = track?.primaryGenreName
+        trackCountry.text = track?.country
 
     }
 }

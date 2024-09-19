@@ -74,6 +74,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <ProgressBar android:id="@+id/progressBar"
+            android:layout_width="@dimen/dp_44"
+            android:layout_height="@dimen/dp_44"
+            android:layout_gravity="center"
+            android:layout_marginTop="124dp"
+            android:indeterminateTint="@color/progressbar"
+            android:visibility="gone"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/trackList"
             android:layout_width="match_parent"
