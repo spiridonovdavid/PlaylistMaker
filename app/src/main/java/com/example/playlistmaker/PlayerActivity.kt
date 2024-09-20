@@ -10,6 +10,7 @@ import android.os.Looper
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -64,11 +65,7 @@ class PlayerActivity : AppCompatActivity() {
         genreValue = findViewById(R.id.genreValue)
         trackCountry = findViewById(R.id.countryValue)
 
-        val track = if (Build.VERSION.SDK_INT >= 33) {
-            intent.getParcelableExtra("TRACK_DATA", Track::class.java)
-        } else {
-            intent.getParcelableExtra("TRACK_DATA")
-        }
+        val track = IntentCompat.getParcelableExtra(intent, "TRACK_DATA", Track::class.java)
 
         backButton.setOnClickListener{
             finish()
