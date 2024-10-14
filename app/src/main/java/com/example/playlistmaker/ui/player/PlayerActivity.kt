@@ -69,7 +69,7 @@ class PlayerActivity : AppCompatActivity() {
         trackCountry = findViewById(R.id.countryValue)
 
         val track = Gson().fromJson(intent.extras?.getString(TRACK_DATA), Track::class.java)
-        println(track)
+
         backButton.setOnClickListener{
             finish()
         }
