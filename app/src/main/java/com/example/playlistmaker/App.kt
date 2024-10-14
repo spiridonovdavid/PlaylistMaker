@@ -1,32 +1,24 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import android.content.SharedPreferences
+import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.data.SettingsRepositoryImpl
 
-const val SHARED_PREFS = "SHARED_PREFS"
-const val THEME_MODE = "THEME_SWITCHER"
-const val HISTORY_SEARCH = "HISTORY_SEARCH"
-const val TRACK_DATA = "TRACK_DATA"
-
-class App : Application() {
-
-    var darkTheme = false
-    var sharedPrefs: SharedPreferences? = null
+class App:Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-        sharedPrefs = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
-        darkTheme = sharedPrefs?.getBoolean(THEME_MODE, false) ?: false // Включаем тему из sharedPrefs при старте App
-        switchTheme(darkTheme)
-
+        instance = this
+        applySavedTheme()
     }
 
-    fun switchTheme(darkThemeEnabled: Boolean) {
-        darkTheme = darkThemeEnabled
+    private fun applySavedTheme() {
+        val themeInteractor = Creator.provideThemeInteractor()
+        val isDarkTheme = themeInteractor.isDarkThemeEnabled()
+
         AppCompatDelegate.setDefaultNightMode(
-            if (darkThemeEnabled) {
+            if (isDarkTheme) {
                 AppCompatDelegate.MODE_NIGHT_YES
             } else {
                 AppCompatDelegate.MODE_NIGHT_NO
@@ -34,4 +26,12 @@ class App : Application() {
         )
     }
 
+    companion object {
+        const val TRACK_DATA = "TRACK"
+        lateinit var instance: App
+            private set
+        fun getAppContext(): Context {
+            return instance.applicationContext
+        }
+    }
 }
