@@ -53,7 +53,8 @@
             android:layout_height="@dimen/dp_36"
             android:layout_gravity="end|center_vertical"
             android:background="@android:color/transparent"
-            android:src="@drawable/close" />
+            android:src="@drawable/close"
+            android:visibility="gone"/>
     </FrameLayout>
 
     <TextView
@@ -136,7 +137,7 @@
 
         <Button
             android:id="@+id/button_update"
-            android:layout_width="108dp"
+            android:layout_width="112dp"
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/dp_24"
