@@ -36,7 +36,6 @@ object Creator {
         return PlayerInteractorImpl(getPlayerRepository())
     }
 
-    // TracksRepository использует сетевой клиент, инициализированный с помощью Retrofit
     private fun getTracksRepository(): TracksRepository {
         return TracksRepositoryImpl(RetrofitNetworkClient())
     }
