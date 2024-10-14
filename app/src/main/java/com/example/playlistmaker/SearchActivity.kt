@@ -3,6 +3,8 @@ package com.example.playlistmaker
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -12,6 +14,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -32,6 +35,7 @@ class SearchActivity : AppCompatActivity() {
     private var buttonUpdate: Button? = null
     private var historyText: TextView? = null
     private var historyClear: Button? = null
+    private var progressBar: ProgressBar? = null
     private val emptyList: MutableList<Track> = mutableListOf()
     private var historyTrack: MutableList<Track>? = mutableListOf()
     private var tracks: MutableList<Track>? = mutableListOf()
@@ -57,6 +61,7 @@ class SearchActivity : AppCompatActivity() {
         buttonUpdate = findViewById(R.id.button_update)
         historyText = findViewById(R.id.text_history)
         historyClear = findViewById(R.id.button_history_clear)
+        progressBar = findViewById(R.id.progressBar)
 
         buttonUpdate?.setOnClickListener {
             initSearch()
@@ -97,6 +102,7 @@ class SearchActivity : AppCompatActivity() {
                 setButtonVisibility(clearButton, s)
                 inputValue = s.toString()
                 showHistory(searchInput?.hasFocus() == true && s.isNullOrEmpty())
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -149,11 +155,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun initSearch() {
+        progressBar?.visibility = View.VISIBLE
+        clearError()
         iTunesApi.search(inputValue).enqueue(object : retrofit2.Callback<ItunesDataModel> {
             override fun onResponse(
                 call: retrofit2.Call<ItunesDataModel>,
                 response: retrofit2.Response<ItunesDataModel>
             ) {
+                progressBar?.visibility = View.GONE
                 if (response.isSuccessful) {
                     tracks = response.body()?.results
                     if (!tracks.isNullOrEmpty()) {
@@ -169,6 +178,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: retrofit2.Call<ItunesDataModel>, t: Throwable) {
+                progressBar?.visibility = View.GONE
                 showNetworkError()
             }
         })
@@ -245,11 +255,21 @@ class SearchActivity : AppCompatActivity() {
         clearAdapter()
     }
 
-    companion object {
-        private const val STRING_VALUE = "SEARCH_QUERY"
-        private const val STRING_DEFAULT = ""
-        private const val SEARCH_RESULTS = "SEARCH_RESULTS"
-        private const val HAS_ERROR = "HAS_ERROR"
-        private const val IS_NETWORK_ERROR = "IS_NETWORK_ERROR"
+    private val searchRunnable = Runnable { initSearch() }
+    private val handler = Handler(Looper.getMainLooper())
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private companion object {
+        const val STRING_VALUE = "SEARCH_QUERY"
+        const val STRING_DEFAULT = ""
+        const val SEARCH_RESULTS = "SEARCH_RESULTS"
+        const val HAS_ERROR = "HAS_ERROR"
+        const val IS_NETWORK_ERROR = "IS_NETWORK_ERROR"
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
+
     }
 }

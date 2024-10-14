@@ -1,14 +1,19 @@
 package com.example.playlistmaker
 
 import android.icu.text.SimpleDateFormat
+import android.media.MediaPlayer
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.google.gson.Gson
 import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
@@ -27,6 +32,19 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var yearValue: TextView
     private lateinit var genreValue: TextView
     private lateinit var trackCountry: TextView
+    private var playerState = STATE_DEFAULT
+    private var mediaPlayer = MediaPlayer()
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val updateTimeRunnable = object : Runnable {
+        override fun run() {
+            if (playerState == STATE_PLAYING) {
+                val currentPosition = mediaPlayer.currentPosition
+                durationPlaying.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(currentPosition)
+                handler.postDelayed(this, DELAY)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,38 +65,103 @@ class PlayerActivity : AppCompatActivity() {
         genreValue = findViewById(R.id.genreValue)
         trackCountry = findViewById(R.id.countryValue)
 
-        val intentState  = getIntent().getExtras();
-        val trackData = intentState?.getString(TRACK_DATA)
-        val track = Gson().fromJson(trackData, Track::class.java)
+        val track = IntentCompat.getParcelableExtra(intent, "TRACK_DATA", Track::class.java)
 
         backButton.setOnClickListener{
             finish()
         }
 
         Glide.with(this)
-            .load(track.artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg"))
+            .load(track?.artworkUrl100?.replaceAfterLast('/',"512x512bb.jpg"))
             .placeholder(R.drawable.placeholderplayer)
             .centerCrop()
             .transform(RoundedCorners(dpToPx(8f, this)))
             .into(albumImage)
 
-        trackName.text = track.trackName
-        artistName.text = track.artistName
+        trackName.text = track?.trackName
+        artistName.text = track?.artistName
 
-        if(track.collectionName?.isEmpty() == true){
+        if(track?.collectionName?.isEmpty() == true){
             albumLabel.isVisible = false
             albumValue.isVisible = false
         }else{
             albumLabel.isVisible = true
             albumValue.isVisible = true
-            albumValue.text = track.collectionName
+            albumValue.text = track?.collectionName
         }
 
-        durationPlaying.text = "0:00"
-        trackDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTime)
-        yearValue.text = track.releaseDate.substring(0,4)
-        genreValue.text = track.primaryGenreName
-        trackCountry.text = track.country
+        durationPlaying.text = "00:00"
+        trackDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track?.trackTime)
+        yearValue.text = track?.releaseDate?.substring(0,4)
+        genreValue.text = track?.primaryGenreName
+        trackCountry.text = track?.country
 
+        if(track?.previewUrl == null){
+            Toast.makeText(this, "@string/nopreivewurl", Toast.LENGTH_SHORT).show()
+        }
+        preparePlayer(track?.previewUrl)
+        buttonPlay.setOnClickListener {
+            playbackControl()
+        }
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+        handler.removeCallbacks(updateTimeRunnable)
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        buttonPlay.setImageResource(R.drawable.playbutton)
+        playerState = STATE_PAUSED
+        handler.removeCallbacks(updateTimeRunnable)
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        buttonPlay.setImageResource(R.drawable.pausebutton)
+        playerState = STATE_PLAYING
+        handler.post(updateTimeRunnable)
+    }
+
+    private fun playbackControl() {
+        when(playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+    private fun preparePlayer(url: String?) {
+        mediaPlayer.setDataSource(url)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            buttonPlay.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            buttonPlay.setImageResource(R.drawable.playbutton)
+            playerState = STATE_PREPARED
+            handler.removeCallbacks(updateTimeRunnable)
+            durationPlaying.text = "00:00"
+        }
+    }
+
+    private companion object {
+        const val STATE_DEFAULT = 0
+        const val STATE_PREPARED = 1
+        const val STATE_PLAYING = 2
+        const val STATE_PAUSED = 3
+        const val DELAY = 300L
     }
 }

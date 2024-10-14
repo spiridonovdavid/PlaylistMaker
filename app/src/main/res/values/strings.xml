@@ -23,4 +23,5 @@
     <string name="year_label">Год</string>
     <string name="genre_label">Жанр</string>
     <string name="country_label">Страна</string>
+    <string name="nopreivewurl">Ошибка, не найдена ссылка на трек</string>
 </resources>
