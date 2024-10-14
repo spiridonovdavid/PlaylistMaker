@@ -9,7 +9,7 @@ class TrackMapper {
             trackName = trackDto.trackName ?: "Неизвестный трек",
             artistName = trackDto.artistName ?: "Неизвестный Артист",
             artworkUrl100 = trackDto.artworkUrl100 ?: "",
-            trackTime = trackDto.trackTime ?: 0L,
+            trackTimeMillis = trackDto.trackTimeMillis ?: 0L,
             collectionName = trackDto.collectionName ?: "Неизвестный альбом",
             releaseDate = trackDto.releaseDate ?: "Неизвестная дата",
             primaryGenreName = trackDto.primaryGenreName ?: "Неизвестный жанр",

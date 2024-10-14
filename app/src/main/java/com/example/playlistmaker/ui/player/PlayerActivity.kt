@@ -69,7 +69,7 @@ class PlayerActivity : AppCompatActivity() {
         trackCountry = findViewById(R.id.countryValue)
 
         val track = Gson().fromJson(intent.extras?.getString(TRACK_DATA), Track::class.java)
-
+        println(track)
         backButton.setOnClickListener{
             finish()
         }
@@ -94,7 +94,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         durationPlaying.text = "00:00"
-        trackDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track?.trackTime)
+        trackDuration.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track?.trackTimeMillis)
         yearValue.text = track?.releaseDate?.substring(0,4)
         genreValue.text = track?.primaryGenreName
         trackCountry.text = track?.country

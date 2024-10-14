@@ -14,8 +14,8 @@ class App:Application() {
     }
 
     private fun applySavedTheme() {
-        val themeRepository = SettingsRepositoryImpl(this)
-        val isDarkTheme = themeRepository.isDarkThemeEnabled()
+        val themeInteractor = Creator.provideThemeInteractor()
+        val isDarkTheme = themeInteractor.isDarkThemeEnabled()
 
         AppCompatDelegate.setDefaultNightMode(
             if (isDarkTheme) {

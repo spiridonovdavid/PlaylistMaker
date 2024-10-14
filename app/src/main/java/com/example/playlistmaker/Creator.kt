@@ -11,11 +11,13 @@ import com.example.playlistmaker.domain.api.PlayerRepository
 import com.example.playlistmaker.domain.api.SearchHistoryInteractor
 import com.example.playlistmaker.domain.api.SettingsInteractor
 import com.example.playlistmaker.domain.api.SettingsRepository
+import com.example.playlistmaker.domain.api.ThemeInteractor
 import com.example.playlistmaker.domain.api.TracksInteractor
 import com.example.playlistmaker.domain.api.TracksRepository
 import com.example.playlistmaker.domain.impl.PlayerInteractorImpl
 import com.example.playlistmaker.domain.impl.SearchHistoryInteractorImpl
 import com.example.playlistmaker.domain.impl.SettingsInteractorImpl
+import com.example.playlistmaker.domain.impl.ThemeInteractorImpl
 import com.example.playlistmaker.domain.impl.TracksInteractorImpl
 
 object Creator {
@@ -34,6 +36,9 @@ object Creator {
     }
     fun providePlayerInteractor(): PlayerInteractor {
         return PlayerInteractorImpl(getPlayerRepository())
+    }
+    fun provideThemeInteractor(): ThemeInteractor {
+        return ThemeInteractorImpl(getThemeRepository())
     }
 
     private fun getTracksRepository(): TracksRepository {

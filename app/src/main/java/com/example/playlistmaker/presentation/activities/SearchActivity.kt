@@ -221,7 +221,7 @@ class SearchActivity : AppCompatActivity() {
         } else {
             hideHistory(false)
             trackList?.clear()
-            recyclerView.adapter = TrackAdapter(trackList!!) { track ->
+            recyclerView.adapter = TrackAdapter(trackList ?: emptyList()) { track ->
                 onTrackClick(track)
             }
         }
