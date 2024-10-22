@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
         android:paddingVertical="16dp"
-        tools:context=".MainActivity">
+        tools:context=".presentation.activities.MainActivity">
 
         <ImageView
             android:id="@+id/back"
@@ -124,6 +124,8 @@
             app:layout_constraintStart_toEndOf="@id/durationLabel"
             app:layout_constraintTop_toBottomOf="@id/durationPlaying" />
 
+
+
         <TextView
             android:id="@+id/albumLabel"
             android:layout_width="wrap_content"
@@ -136,14 +138,20 @@
 
         <TextView
             android:id="@+id/albumValue"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="32dp"
             android:gravity="center_vertical"
             style="@style/labelValue"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1"
             app:layout_constraintStart_toEndOf="@id/albumLabel"
+            app:layout_constraintWidth_default="wrap"
+            android:layout_marginStart="8dp"
             app:layout_constraintTop_toBottomOf="@id/durationValue" />
+
 
         <TextView
             android:id="@+id/yearLabel"

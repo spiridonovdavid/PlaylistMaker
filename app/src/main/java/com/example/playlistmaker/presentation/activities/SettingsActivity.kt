@@ -1,27 +1,37 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.activities
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.Creator
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.api.SettingsInteractor
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var settingsInteractor: SettingsInteractor
+    private var isDarkThemeEnabled: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val appContext = (applicationContext as App)
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.switchtheme)
+        settingsInteractor = Creator.provideSettingsInteractor()
+        isDarkThemeEnabled = settingsInteractor.isDarkThemeEnabled()
 
-        themeSwitcher.isChecked = appContext.darkTheme
-        themeSwitcher.setOnCheckedChangeListener { _, checked ->
-            appContext.switchTheme(checked)
-            appContext.sharedPrefs?.edit()
-                ?.putBoolean(THEME_MODE, checked)
-                ?.apply()
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.switchtheme)
+        themeSwitcher.isChecked = isDarkThemeEnabled
+
+        themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked != isDarkThemeEnabled) {
+                isDarkThemeEnabled = isChecked
+                settingsInteractor.switchTheme(isChecked)
+                switchTheme(isChecked)
+            }
         }
 
         val backButton = findViewById<View>(R.id.back)
@@ -57,6 +67,16 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.policy_text))))
         }
 
+    }
+
+    private fun switchTheme(isDarkTheme: Boolean) {
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkTheme) {
+                AppCompatDelegate.MODE_NIGHT_YES
+            } else {
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+        )
     }
 
 }
