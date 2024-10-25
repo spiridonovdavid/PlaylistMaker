@@ -3,7 +3,7 @@ package com.example.playlistmaker
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.data.SettingsRepositoryImpl
+import com.example.playlistmaker.creator.Creator
 
 class App:Application() {
 
@@ -14,11 +14,11 @@ class App:Application() {
     }
 
     private fun applySavedTheme() {
-        val themeInteractor = Creator.provideThemeInteractor()
-        val isDarkTheme = themeInteractor.isDarkThemeEnabled()
+        val settingsInteractor = Creator.provideSettingsInteractor()
+        val themeSettings = settingsInteractor.getThemeSettings()
 
         AppCompatDelegate.setDefaultNightMode(
-            if (isDarkTheme) {
+            if (themeSettings.isDarkTheme) {
                 AppCompatDelegate.MODE_NIGHT_YES
             } else {
                 AppCompatDelegate.MODE_NIGHT_NO
