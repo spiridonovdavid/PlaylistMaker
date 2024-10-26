@@ -268,7 +268,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.textHistory.isVisible = stateCount
-        binding.clearButton.isVisible = stateCount
+        binding.buttonHistoryClear.isVisible = stateCount
 
     }
 
