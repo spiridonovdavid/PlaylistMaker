@@ -1,4 +1,4 @@
-package com.example.playlistmaker.sharing.data
+package com.example.playlistmaker.sharing.data.impl
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -57,3 +57,6 @@ class SharingRepositoryImpl(private val context: Context) : SharingRepository {
         }
     }
 }
+
+
+

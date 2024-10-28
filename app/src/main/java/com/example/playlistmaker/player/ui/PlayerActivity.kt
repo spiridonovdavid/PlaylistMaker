@@ -3,28 +3,24 @@ package com.example.playlistmaker.player.ui
 import android.icu.text.SimpleDateFormat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.App.Companion.TRACK_DATA
 import com.google.gson.Gson
 import java.util.Locale
 import androidx.core.view.isVisible
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.player.model.PlayerState
 import com.example.playlistmaker.player.ui.view_model.PlayerViewModel
 import com.example.playlistmaker.search.model.Track
 import com.example.playlistmaker.utils.dpToPx
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
-
-    private val playerViewModel: PlayerViewModel by viewModels {
-        PlayerViewModel.provideFactory(Creator.providePlayerInteractor())
-    }
+    private val playerViewModel by viewModel<PlayerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
