@@ -36,6 +36,8 @@
                 style="@style/SettingsItemText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                app:trackTint="@color/switch_one"
+                app:thumbTint="@color/switch_two"
                 android:text="@string/theme" />
 
         </LinearLayout>

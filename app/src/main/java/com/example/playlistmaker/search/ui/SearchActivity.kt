@@ -14,6 +14,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.widget.doOnTextChanged
 import com.example.playlistmaker.App
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.search.model.Track
 import com.example.playlistmaker.search.adapters.TrackAdapter
@@ -89,10 +90,15 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.searchInput.doOnTextChanged { text, _, _, _ ->
-            clearError()
             searchDebounce()
             binding.clearButton.isVisible = !text.isNullOrEmpty()
             searchText = text.toString()
+
+            if (text.isNullOrEmpty()) {
+                clearError()
+                viewModel.updateSearchHistory()
+                trackAdapter.updateTracks(emptyList())
+            }
         }
 
         binding.searchInput.setOnEditorActionListener { _, actionId, _ ->
@@ -159,6 +165,14 @@ class SearchActivity : AppCompatActivity() {
         binding.errorLayout.isVisible = true
         binding.errorText.text = getString(messageResId)
         binding.buttonHistoryClear.isVisible = false
+
+
+        val errorImageResId = when (messageResId) {
+            R.string.error_internet -> R.drawable.error_internet
+            R.string.error_not_found -> R.drawable.error_notfound
+            else -> R.drawable.error_notfound
+        }
+        binding.errorImage.setImageResource(errorImageResId)
     }
 
     private fun showHistory(historyTracks: List<Track>) {
@@ -210,6 +224,13 @@ class SearchActivity : AppCompatActivity() {
         searchText = savedInstanceState.getString(KEY_SEARCH_TEXT, "")
         binding.searchInput.setText(searchText)
         viewModel.performSearch(searchText)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (searchText.isNotEmpty()) {
+            viewModel.restoreLastSearchResult()
+        }
     }
 
     companion object {

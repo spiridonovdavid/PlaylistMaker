@@ -17,6 +17,7 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private val screenState = MutableLiveData<SearchScreenState>()
+    private var lastSearchResult: List<Track>? = null
 
     fun getScreenState(): LiveData<SearchScreenState> = screenState
 
@@ -28,6 +29,7 @@ class SearchViewModel(
         tracksInteractor.searchTracks(query, object : TracksInteractor.TracksConsumer {
             override fun consume(foundTracks: List<Track>) {
                 if (foundTracks.isNotEmpty()) {
+                    lastSearchResult = foundTracks
                     screenState.postValue(SearchScreenState.ShowSearchResults(foundTracks))
                 } else {
                     screenState.postValue(SearchScreenState.Error(R.string.error_not_found))
@@ -40,6 +42,12 @@ class SearchViewModel(
                 R.string.error_not_found
             }
             screenState.postValue(SearchScreenState.Error(errorMessageResId))
+        }
+    }
+
+    fun restoreLastSearchResult() {
+        lastSearchResult?.let {
+            screenState.value = SearchScreenState.ShowSearchResults(it)
         }
     }
 
@@ -61,5 +69,4 @@ class SearchViewModel(
         searchHistoryInteractor.clearHistory()
         updateSearchHistory()
     }
-
 }
