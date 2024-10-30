@@ -1,4 +1,4 @@
-package com.example.playlistmaker.settings.ui.view_model
+package com.example.playlistmaker.settings.view_model
 
 import android.content.Intent
 import android.net.Uri
@@ -20,6 +20,7 @@ class SettingsViewModel(
     private val _actionCommand = MutableLiveData<Intent?>()
     val actionCommand: LiveData<Intent?> get() = _actionCommand
 
+    // Обновление настроек темы и применение
     fun updateThemeSettings(themeSettings: ThemeSettings) {
         settingsInteractor.updateThemeSettings(themeSettings)
         _themeChanged.postValue(themeSettings.isDarkTheme)
@@ -52,11 +53,10 @@ class SettingsViewModel(
         }
         _actionCommand.postValue(emailIntent)
     }
-
     fun clearActionCommand() {
         _actionCommand.postValue(null)
     }
-
+    // Получение текущих настроек темы
     fun getThemeSettings(): ThemeSettings {
         return settingsInteractor.getThemeSettings()
     }

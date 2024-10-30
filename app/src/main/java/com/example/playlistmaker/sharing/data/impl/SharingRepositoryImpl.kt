@@ -31,7 +31,7 @@ class SharingRepositoryImpl(private val context: Context) : SharingRepository {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, appLink)
         }
-        context.startActivity(Intent.createChooser(shareIntent, "Поделиться через"))
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.text_share)))
     }
 
     @SuppressLint("QueryPermissionsNeeded")
@@ -57,6 +57,3 @@ class SharingRepositoryImpl(private val context: Context) : SharingRepository {
         }
     }
 }
-
-
-

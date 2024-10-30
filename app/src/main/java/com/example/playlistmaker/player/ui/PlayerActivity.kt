@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.App.Companion.TRACK_DATA
+import com.example.playlistmaker.App.Companion.TRACK_DT
 import com.google.gson.Gson
 import java.util.Locale
 import androidx.core.view.isVisible
@@ -20,7 +20,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
-    private val playerViewModel by viewModel<PlayerViewModel>()
+
+    private val viewModel by viewModel<PlayerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,11 +34,10 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         val intentState = intent.extras
-        val trackData = intentState?.getString(TRACK_DATA)
+        val trackData = intentState?.getString(TRACK_DT)
         val track = Gson().fromJson(trackData, Track::class.java)
-
         setupTrackInfo(track)
-        playerViewModel.preparePlayer(track.previewUrl)
+        viewModel.preparePlayer(track.previewUrl)
         observePlayerState()
         observePlayerPosition()
         setupButtonListener()
@@ -61,6 +61,7 @@ class PlayerActivity : AppCompatActivity() {
             genreValue.text = track.primaryGenreName
             countryValue.text = track.country
 
+
             if (track.collectionName.isEmpty()) {
                 albumLabel.isVisible = false
                 binding.albumValue.isVisible = false
@@ -73,7 +74,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun observePlayerState() {
-        playerViewModel.playerState.observe(this) { state ->
+        viewModel.playerState.observe(this) { state ->
             when (state) {
                 is PlayerState.Playing -> binding.playButton.setImageResource(R.drawable.pausebutton)
                 is PlayerState.Paused, is PlayerState.Prepared -> binding.playButton.setImageResource(R.drawable.playbutton)
@@ -83,19 +84,19 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun observePlayerPosition() {
-        playerViewModel.currentPosition.observe(this) { position ->
+        viewModel.currentPosition.observe(this) { position ->
             binding.durationPlaying.text = position
         }
     }
 
     override fun onPause() {
         super.onPause()
-        playerViewModel.pausePlayer()
+        viewModel.pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        playerViewModel.releasePlayer()
+        viewModel.releasePlayer()
     }
 
     private fun setupButtonListener() {
@@ -103,11 +104,10 @@ class PlayerActivity : AppCompatActivity() {
             playbackControl()
         }
     }
-
     private fun playbackControl() {
-        when (playerViewModel.playerState.value) {
-            is PlayerState.Playing -> playerViewModel.pausePlayer()
-            is PlayerState.Paused, PlayerState.Prepared -> playerViewModel.startPlayer()
+        when (viewModel.playerState.value) {
+            is PlayerState.Playing -> viewModel.pausePlayer()
+            is PlayerState.Paused, PlayerState.Prepared -> viewModel.startPlayer()
             else -> Unit
         }
     }

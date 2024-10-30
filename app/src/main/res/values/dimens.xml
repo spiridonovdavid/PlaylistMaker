@@ -18,4 +18,6 @@
     <dimen name="sp_14">14sp</dimen>
     <dimen name="sp_13">13sp</dimen>
     <dimen name="sp_11">11sp</dimen>
+
+    <dimen name="bottom_navigation_height">56dp</dimen>
 </resources>

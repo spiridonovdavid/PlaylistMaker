@@ -12,23 +12,27 @@ import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
-
 class App:Application() {
 
     override fun onCreate() {
         super.onCreate()
         instance = this
+
         startKoin {
             androidContext(this@App)
             modules(dataModule, repositoryModule, interactorModule, viewModelModule)
         }
+        // Применяем тему при запуске приложения
         applySavedTheme()
+
+
     }
 
     private fun applySavedTheme() {
         val settingsInteractor: SettingsInteractor by inject()
         val themeSettings = settingsInteractor.getThemeSettings()
 
+        // Применяем тему
         AppCompatDelegate.setDefaultNightMode(
             if (themeSettings.isDarkTheme) {
                 AppCompatDelegate.MODE_NIGHT_YES
@@ -39,9 +43,10 @@ class App:Application() {
     }
 
     companion object {
-        const val TRACK_DATA = "TRACK"
+        const val TRACK_DT = "TRACK"
         lateinit var instance: App
             private set
+        // Метод для получения Application Context
         fun getAppContext(): Context {
             return instance.applicationContext
         }

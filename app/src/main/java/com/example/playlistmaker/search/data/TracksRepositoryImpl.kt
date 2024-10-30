@@ -15,12 +15,13 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
 
         return if (response.resultCode == 200) {
             (response as TracksResponse).results.map { trackDto ->
-                trackMapper.mapTrackDtoToDomain(trackDto)
+                trackMapper.mapTrackDtoToDomain(trackDto) // Используем маппер (Маппинг из DTO в доменную модель)
             }
         } else if (response.resultCode == 500) {
+            // Ошибка сети
             throw IOException("Network Error")
         } else {
-            emptyList()
+            emptyList() // В случае ошибки возвращаем пустой список
         }
     }
 }

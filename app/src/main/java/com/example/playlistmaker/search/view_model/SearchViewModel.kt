@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.ui.view_model
+package com.example.playlistmaker.search.view_model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,19 +17,25 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private val screenState = MutableLiveData<SearchScreenState>()
-    private var lastSearchResult: List<Track>? = null
-
     fun getScreenState(): LiveData<SearchScreenState> = screenState
 
-    fun performSearch(query: String) {
-        if (query.isEmpty()) return
+    private var lastSearchQuery: String? = null
+    private var lastSearchResults: List<Track>? = null
+    private var isShowingHistory = true
 
+    init {
+        updateSearchHistory()
+    }
+
+    fun performSearch(query: String) {
+        lastSearchQuery = query
+        isShowingHistory = false
         screenState.value = SearchScreenState.Loading
 
         tracksInteractor.searchTracks(query, object : TracksInteractor.TracksConsumer {
             override fun consume(foundTracks: List<Track>) {
                 if (foundTracks.isNotEmpty()) {
-                    lastSearchResult = foundTracks
+                    lastSearchResults = foundTracks
                     screenState.postValue(SearchScreenState.ShowSearchResults(foundTracks))
                 } else {
                     screenState.postValue(SearchScreenState.Error(R.string.error_not_found))
@@ -45,14 +51,9 @@ class SearchViewModel(
         }
     }
 
-    fun restoreLastSearchResult() {
-        lastSearchResult?.let {
-            screenState.value = SearchScreenState.ShowSearchResults(it)
-        }
-    }
-
     fun updateSearchHistory() {
         val history = searchHistoryInteractor.getHistory()
+        isShowingHistory = true
         if (history.isNotEmpty()) {
             screenState.postValue(SearchScreenState.ShowHistory(history))
         } else {
@@ -62,11 +63,24 @@ class SearchViewModel(
 
     fun saveTrackToHistory(track: Track) {
         searchHistoryInteractor.saveTrack(track)
-        updateSearchHistory()
     }
 
     fun clearHistory() {
         searchHistoryInteractor.clearHistory()
         updateSearchHistory()
     }
+
+    fun restoreLastState() {
+        if (isShowingHistory) {
+            updateSearchHistory()
+        } else {
+            lastSearchQuery?.let { performSearch(it) }
+        }
+    }
+
+    fun setLastSearchState() {
+        lastSearchResults?.let { screenState.postValue(SearchScreenState.ShowSearchResults(it)) }
+    }
 }
+
+

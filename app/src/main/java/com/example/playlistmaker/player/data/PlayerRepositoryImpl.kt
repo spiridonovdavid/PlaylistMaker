@@ -3,13 +3,12 @@ package com.example.playlistmaker.player.data
 import android.media.MediaPlayer
 import com.example.playlistmaker.player.domain.api.PlayerRepository
 
-class PlayerRepositoryImpl(
-    private val mediaPlayer: MediaPlayer
-) : PlayerRepository {
+class PlayerRepositoryImpl : PlayerRepository {
+
+    private var mediaPlayer = MediaPlayer()
+
 
     override fun preparePlayer(url: String?, onReady: () -> Unit, onComplete: () -> Unit) {
-        mediaPlayer.reset()
-
         if (url != null) {
             mediaPlayer.setDataSource(url)
             mediaPlayer.prepareAsync()

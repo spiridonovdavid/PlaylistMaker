@@ -6,14 +6,14 @@ import com.example.playlistmaker.search.model.Track
 class TrackMapper {
     fun mapTrackDtoToDomain(trackDto: TrackDto): Track {
         return Track(
-            trackName = trackDto.trackName ?: "Неизвестный трек",
-            artistName = trackDto.artistName ?: "Неизвестный Артист",
-            artworkUrl100 = trackDto.artworkUrl100 ?: "",
+            trackName = trackDto.trackName ?: "Unknown Track",
+            artistName = trackDto.artistName ?: "Unknown Artist",
             trackTimeMillis = trackDto.trackTimeMillis ?: 0L,
-            collectionName = trackDto.collectionName ?: "Неизвестный альбом",
-            releaseDate = trackDto.releaseDate ?: "Неизвестная дата",
-            primaryGenreName = trackDto.primaryGenreName ?: "Неизвестный жанр",
-            country = trackDto.country ?: "Неизвестная страна",
+            artworkUrl100 = trackDto.artworkUrl100 ?: "",
+            collectionName = trackDto.collectionName ?: "Unknown Collection",
+            releaseDate = trackDto.releaseDate ?: "Unknown Date",
+            primaryGenreName = trackDto.primaryGenreName ?: "Unknown Genre",
+            country = trackDto.country ?: "Unknown Country",
             previewUrl = trackDto.previewUrl
         )
     }

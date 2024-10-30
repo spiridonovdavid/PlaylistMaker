@@ -1,3 +1,5 @@
+package com.example.playlistmaker.sharing.domain.impl
+
 import com.example.playlistmaker.sharing.domain.api.SharingInteractor
 import com.example.playlistmaker.sharing.domain.api.SharingRepository
 import com.example.playlistmaker.sharing.model.EmailData
@@ -18,4 +20,3 @@ class SharingInteractorImpl(
         return repository.getSupportEmailData()
     }
 }
-
