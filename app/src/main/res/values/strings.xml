@@ -24,4 +24,9 @@
     <string name="genre_label">Жанр</string>
     <string name="country_label">Страна</string>
     <string name="nopreivewurl">Ошибка, не найдена ссылка на трек</string>
+    <string name="empty_favorite">Ваша медиатека пуста</string>
+    <string name="empty_playlist">Вы не создали\nни одного плейлиста</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="favorite">Избранные треки</string>
+    <string name="playlist">Плейлисты</string>
 </resources>

@@ -59,4 +59,5 @@ dependencies {
     implementation(libs.koin.android.compat)
     implementation(libs.koin.androidx.navigation)
     implementation(libs.koin.androidx.workmanager)
+    implementation(libs.fragment)
 }
