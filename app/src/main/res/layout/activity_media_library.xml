@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/tab_bg"
-        app:tabRippleColor="@color/whitetoblack"
+        app:tabRippleColor="@color/tab_bg"
         app:tabTextColor="@color/textblacktowhite"
         app:tabIndicatorColor="@color/textblacktowhite"
         app:tabIndicatorFullWidth="true"
