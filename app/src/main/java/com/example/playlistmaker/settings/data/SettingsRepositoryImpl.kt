@@ -18,7 +18,7 @@ class SettingsRepositoryImpl(private val context: Context) : SettingsRepository 
     override fun updateThemeSetting(settings: ThemeSettings) {
         val sharedPreferences = context.getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE)
         sharedPreferences.edit().putBoolean(DARK_THEME, settings.isDarkTheme).apply()
-
+        // Применяем тему
         AppCompatDelegate.setDefaultNightMode(
             if (settings.isDarkTheme) {
                 AppCompatDelegate.MODE_NIGHT_YES

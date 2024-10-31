@@ -5,12 +5,14 @@ import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.TracksRequest
 import java.io.IOException
 
-class RetrofitNetworkClient(private val itunesService: iTunesService) : NetworkClient
+class RetrofitNetworkClient(private val apiService: ApiService) : NetworkClient
 {
+
+
     override fun doRequest(dto: Any): Response {
         return try {
             if (dto is TracksRequest) {
-                val resp = itunesService.searchTracks(dto.expression).execute()
+                val resp = apiService.searchTracks(dto.expression).execute()
 
                 val body = resp.body() ?: Response()
                 body.apply { resultCode = resp.code() }
@@ -18,6 +20,7 @@ class RetrofitNetworkClient(private val itunesService: iTunesService) : NetworkC
                 Response().apply { resultCode = 400 }
             }
         } catch (e: IOException) {
+            // Ошибка сети или отсутствие подключения
             Response().apply { resultCode = 500 }
         }
     }

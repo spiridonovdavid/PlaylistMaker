@@ -9,12 +9,14 @@ class TracksInteractorImpl(private val repository: TracksRepository) :
     override fun searchTracks(query: String, consumer: TracksInteractor.TracksConsumer, onError: (Throwable) -> Unit) {
         val thread = Thread {
             try {
+                // Выполняем поиск треков
                 val foundTracks = repository.searchTracks(query)
                 consumer.consume(foundTracks)
             } catch (e: IOException) {
-                onError(e)
+                // Обрабатываем ошибку сети (отсутствие подключения к интернету)
+                onError(e) // Передаем ошибку наверх
             } catch (e: Exception) {
-                consumer.consume(emptyList())
+                consumer.consume(emptyList()) // Передаем пустой список в случае других ошибок
             }
         }
         thread.start()
