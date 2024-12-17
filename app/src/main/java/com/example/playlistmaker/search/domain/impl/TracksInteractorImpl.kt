@@ -14,11 +14,9 @@ class TracksInteractorImpl(
     override fun searchTracks(query: String): Flow<List<Track>> {
         return repository.searchTracks(query)
             .map { tracks ->
-                // Здесь можно обработать данные перед отправкой наверх
                 if (tracks.isNotEmpty()) tracks else emptyList()
             }
             .catch { e ->
-                // Обработка ошибок
                 throw e
             }
     }
