@@ -9,13 +9,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.playlistmaker.App
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
@@ -24,6 +23,7 @@ import com.example.playlistmaker.search.adapters.TrackAdapter
 import com.example.playlistmaker.search.model.SearchScreenState
 import com.example.playlistmaker.search.view_model.SearchViewModel
 import com.example.playlistmaker.player.ui.PlayerActivity
+import com.example.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -33,14 +33,10 @@ class SearchFragment : Fragment() {
 
     private lateinit var trackAdapter: TrackAdapter
     private var searchText: String = ""
-    private val handler = Handler(Looper.getMainLooper())
-    private var isClickAllowed = true
 
-    private val searchRunnable = Runnable {
-        if (binding.searchInput.text.toString().isNotEmpty()) {
-            viewModel.performSearch(binding.searchInput.text.toString())
-        }
-    }
+    private lateinit var trackClickDebounce: (Track) -> Unit
+    private lateinit var trackSearchDebounce: (Unit) -> Unit
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,8 +50,15 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        trackClickDebounce = debounce(SEARCH_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) {
+            viewModel.saveTrackToHistory(it)
+        }
+        trackSearchDebounce = debounce(CLICK_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) {
+            viewModel.performSearch(binding.searchInput.text.toString())
+        }
+
         trackAdapter = TrackAdapter(emptyList()) { track ->
-            if (clickDebounce()) onTrackClick(track)
+            onTrackClick(track)
         }
 
         binding.trackList.apply {
@@ -82,7 +85,9 @@ class SearchFragment : Fragment() {
         }
 
         binding.searchInput.doOnTextChanged { text, _, _, _ ->
-            searchDebounce()
+
+            trackSearchDebounce(Unit)
+
             binding.clearButton.isVisible = !text.isNullOrEmpty()
             searchText = text.toString()
 
@@ -139,20 +144,6 @@ class SearchFragment : Fragment() {
                 is SearchScreenState.Empty -> hideHistory()
             }
         }
-    }
-
-    private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-    }
-
-    private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
-        }
-        return current
     }
 
     private fun showLoading() {
@@ -221,9 +212,7 @@ class SearchFragment : Fragment() {
         val intent = Intent(requireContext(), PlayerActivity::class.java)
         intent.putExtra(App.TRACK_DT, Gson().toJson(track))
         startActivity(intent)
-        Handler(Looper.getMainLooper()).postDelayed({
-            viewModel.saveTrackToHistory(track)
-        }, 200)
+        trackClickDebounce(track)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -38,8 +38,7 @@ class PlayerActivity : AppCompatActivity() {
         val track = Gson().fromJson(trackData, Track::class.java)
         setupTrackInfo(track)
         viewModel.preparePlayer(track.previewUrl)
-        observePlayerState()
-        observePlayerPosition()
+        observeViewModel()
         setupButtonListener()
     }
 
@@ -73,19 +72,26 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun observePlayerState() {
+    private fun observeViewModel() {
         viewModel.playerState.observe(this) { state ->
             when (state) {
-                is PlayerState.Playing -> binding.playButton.setImageResource(R.drawable.pausebutton)
-                is PlayerState.Paused, is PlayerState.Prepared -> binding.playButton.setImageResource(R.drawable.playbutton)
-                else -> {binding.playButton.setImageResource(R.drawable.playbutton)}
+                is PlayerState.Playing -> {
+                    binding.playButton.setImageResource(R.drawable.pausebutton)
+                    binding.durationPlaying.text = state.currentPosition
+                }
+                is PlayerState.Paused -> {
+                    binding.playButton.setImageResource(R.drawable.playbutton)
+                    binding.durationPlaying.text = state.currentPosition
+                }
+                PlayerState.Prepared -> {
+                    binding.playButton.setImageResource(R.drawable.playbutton)
+                    binding.durationPlaying.text = "00:00"
+                }
+                PlayerState.Default -> {
+                    binding.playButton.setImageResource(R.drawable.playbutton)
+                    binding.durationPlaying.text = "00:00"
+                }
             }
-        }
-    }
-
-    private fun observePlayerPosition() {
-        viewModel.currentPosition.observe(this) { position ->
-            binding.durationPlaying.text = position
         }
     }
 

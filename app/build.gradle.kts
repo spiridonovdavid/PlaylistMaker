@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.convertergson)
     implementation(libs.retrofit)
     implementation(libs.gson)
