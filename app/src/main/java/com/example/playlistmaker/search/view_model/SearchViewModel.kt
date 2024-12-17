@@ -33,12 +33,13 @@ class SearchViewModel(
     fun performSearch(query: String) {
         lastSearchQuery = query
         isShowingHistory = false
-        screenState.value = SearchScreenState.Loading
+
         if (query.isBlank()) {
             updateSearchHistory()
             return
         }
 
+        screenState.value = SearchScreenState.Loading
         viewModelScope.launch {
             try {
                 tracksInteractor.searchTracks(query).collect { tracks ->

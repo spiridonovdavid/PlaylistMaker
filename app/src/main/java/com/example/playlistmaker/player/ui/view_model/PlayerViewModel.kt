@@ -17,9 +17,6 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
     private val _playerState = MutableLiveData<PlayerState>()
     val playerState: LiveData<PlayerState> get() = _playerState
 
-    private val _currentPosition = MutableLiveData<String>()
-    val currentPosition: LiveData<String> get() = _currentPosition
-
     private var updateJob: Job? = null
 
     init {
@@ -33,20 +30,19 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
             }, onComplete = {
                 stopPositionUpdates()
                 _playerState.postValue(PlayerState.Prepared)
-                _currentPosition.postValue(formatTime(0))
             })
         }
     }
 
     fun startPlayer() {
         playerInteractor.startPlayer()
-        _playerState.value = PlayerState.Playing
+        _playerState.value = PlayerState.Playing(formatTime(playerInteractor.getCurrentPosition()))
         startPositionUpdates()
     }
 
     fun pausePlayer() {
         playerInteractor.pausePlayer()
-        _playerState.value = PlayerState.Paused
+        _playerState.value = PlayerState.Paused(formatTime(playerInteractor.getCurrentPosition()))
         stopPositionUpdates()
     }
 
@@ -60,7 +56,7 @@ class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewMode
         updateJob = viewModelScope.launch {
             while (true) {
                 val position = playerInteractor.getCurrentPosition()
-                _currentPosition.postValue(formatTime(position))
+                _playerState.postValue(PlayerState.Playing(formatTime(position)))
                 delay(UPDATE_DELAY)
             }
         }
