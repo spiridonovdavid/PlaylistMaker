@@ -3,12 +3,14 @@ package com.example.playlistmaker.search.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.api.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.model.Track
-
 import com.example.playlistmaker.search.model.SearchScreenState
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 class SearchViewModel(
@@ -27,47 +29,56 @@ class SearchViewModel(
         updateSearchHistory()
     }
 
+
     fun performSearch(query: String) {
         lastSearchQuery = query
         isShowingHistory = false
         screenState.value = SearchScreenState.Loading
+        if (query.isBlank()) {
+            updateSearchHistory()
+            return
+        }
 
-        tracksInteractor.searchTracks(query, object : TracksInteractor.TracksConsumer {
-            override fun consume(foundTracks: List<Track>) {
-                if (foundTracks.isNotEmpty()) {
-                    lastSearchResults = foundTracks
-                    screenState.postValue(SearchScreenState.ShowSearchResults(foundTracks))
-                } else {
-                    screenState.postValue(SearchScreenState.Error(R.string.error_not_found))
+        viewModelScope.launch {
+            try {
+                tracksInteractor.searchTracks(query).collect { tracks ->
+                    if (tracks.isNotEmpty()) {
+                        lastSearchResults = tracks
+                        screenState.postValue(SearchScreenState.ShowSearchResults(tracks))
+                    } else {
+                        screenState.postValue(SearchScreenState.Error(R.string.error_not_found))
+                    }
                 }
+            } catch (e: IOException) {
+                screenState.postValue(SearchScreenState.Error(R.string.error_internet))
             }
-        }) { throwable ->
-            val errorMessageResId = if (throwable is IOException) {
-                R.string.error_internet
-            } else {
-                R.string.error_not_found
-            }
-            screenState.postValue(SearchScreenState.Error(errorMessageResId))
         }
     }
 
     fun updateSearchHistory() {
-        val history = searchHistoryInteractor.getHistory()
-        isShowingHistory = true
-        if (history.isNotEmpty()) {
-            screenState.postValue(SearchScreenState.ShowHistory(history))
-        } else {
-            screenState.postValue(SearchScreenState.Empty)
+        viewModelScope.launch {
+            searchHistoryInteractor.getHistory().collect { history ->
+                isShowingHistory = true
+                if (history.isNotEmpty()) {
+                    screenState.postValue(SearchScreenState.ShowHistory(history))
+                } else {
+                    screenState.postValue(SearchScreenState.Empty)
+                }
+            }
         }
     }
 
     fun saveTrackToHistory(track: Track) {
-        searchHistoryInteractor.saveTrack(track)
+        viewModelScope.launch {
+            searchHistoryInteractor.saveTrack(track)
+        }
     }
 
     fun clearHistory() {
-        searchHistoryInteractor.clearHistory()
-        updateSearchHistory()
+        viewModelScope.launch {
+            searchHistoryInteractor.clearHistory()
+            updateSearchHistory()
+        }
     }
 
     fun restoreLastState() {
@@ -78,9 +89,6 @@ class SearchViewModel(
         }
     }
 
-    fun setLastSearchState() {
-        lastSearchResults?.let { screenState.postValue(SearchScreenState.ShowSearchResults(it)) }
-    }
 }
 
 

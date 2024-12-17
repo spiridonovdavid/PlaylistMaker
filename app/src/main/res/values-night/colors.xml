@@ -7,7 +7,7 @@
     <color name="arrow">#FFFFFF</color>
     <color name="icon_settings">#FFFFFF</color>
     <color name="search_input">#FFFFFF</color>
-    <color name="search_hint">#000000</color>
+    <color name="search_hint">#AEAFB4</color>
     <color name="textcolor">#FFFFFF</color>
     <color name="whitetoblack">#000000</color>
     <color name="textblacktowhite">#FFFFFF</color>
