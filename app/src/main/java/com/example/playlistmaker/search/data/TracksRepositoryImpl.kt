@@ -17,14 +17,14 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
         return flow {
             val response = networkClient.doRequest(TracksRequest(expression))
 
-            if (response.resultCode == 200) {
-                emit((response as TracksResponse).results.map { trackDto ->
-                    trackMapper.mapTrackDtoToDomain(trackDto)
-                })
-            } else if (response.resultCode == 500) {
-                throw IOException("Network Error")
-            } else {
-                emit(emptyList())
+            when (response.resultCode) {
+                200 -> {
+                    emit((response as TracksResponse).results.map { trackDto ->
+                        trackMapper.mapTrackDtoToDomain(trackDto)
+                    })
+                }
+                500 -> throw IOException("Network Error")
+                else -> emit(emptyList())
             }
         }.catch { exception ->
             throw exception
