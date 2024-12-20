@@ -134,7 +134,7 @@
 
         <Button
             android:id="@+id/button_update"
-            android:layout_width="112dp"
+            android:layout_width="122dp"
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/dp_24"
