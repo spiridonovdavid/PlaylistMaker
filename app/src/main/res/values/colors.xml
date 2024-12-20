@@ -16,6 +16,7 @@
     <color name="switch_one">#E6E8EB</color>
     <color name="switch_two">#AEAFB4</color>
     <color name="tab_bg">#FFFFFF</color>
+    <color name="favoritebg">#1A1B22</color>
 
     <color name="bottom_nav_background">#FFFFFF</color>
     <color name="bottom_nav_line">#80E6E8EB</color>

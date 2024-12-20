@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -39,6 +40,12 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    kotlin {
+        kapt {
+            correctErrorTypes = true
+        }
+    }
 }
 
 dependencies {
@@ -63,4 +70,7 @@ dependencies {
     implementation(libs.fragment)
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
 }

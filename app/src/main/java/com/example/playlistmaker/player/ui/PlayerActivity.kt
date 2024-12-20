@@ -33,14 +33,25 @@ class PlayerActivity : AppCompatActivity() {
             finish()
         }
 
-        val intentState = intent.extras
-        val trackData = intentState?.getString(TRACK_DT)
-        val track = Gson().fromJson(trackData, Track::class.java)
-        setupTrackInfo(track)
-        viewModel.preparePlayer(track.previewUrl)
-        observeViewModel()
-        setupButtonListener()
+        val track: Track? = intent.getParcelableExtra(TRACK_DT)
+
+        if (track != null) {
+            viewModel.loadTrack(track)
+            setupTrackInfo(track)
+            viewModel.preparePlayer(track.previewUrl)
+
+            observeViewModel()
+
+            setupButtonListener()
+
+            binding.likeButton.setOnClickListener {
+                viewModel.onFavoriteClicked(track)
+            }
+
+        }
     }
+
+
 
     private fun setupTrackInfo(track: Track) {
         val artworkUrl = track.artworkUrl100.replace("100x100bb.jpg", "512x512bb.jpg")
@@ -92,6 +103,19 @@ class PlayerActivity : AppCompatActivity() {
                     binding.durationPlaying.text = "00:00"
                 }
             }
+        }
+
+        viewModel.favoriteState.observe(this) { isFavorite ->
+            updateFavoriteIcon(isFavorite)
+        }
+
+    }
+
+    private fun updateFavoriteIcon(isFavorite: Boolean) {
+        if (isFavorite) {
+            binding.likeButton.setImageResource(R.drawable.likebutton_active)
+        } else {
+            binding.likeButton.setImageResource(R.drawable.likebutton)
         }
     }
 
