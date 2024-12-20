@@ -53,13 +53,17 @@ class SearchFragment : Fragment() {
         trackClickDebounce = debounce(SEARCH_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) {
             viewModel.saveTrackToHistory(it)
         }
+
         trackSearchDebounce = debounce(CLICK_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) {
             viewModel.performSearch(binding.searchInput.text.toString())
         }
 
-        trackAdapter = TrackAdapter(emptyList()) { track ->
-            onTrackClick(track)
-        }
+        trackAdapter = TrackAdapter(
+            emptyList(),
+            onTrackClick = { track ->
+                onTrackClick(track)
+            }
+        )
 
         binding.trackList.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -210,7 +214,7 @@ class SearchFragment : Fragment() {
 
     private fun onTrackClick(track: Track) {
         val intent = Intent(requireContext(), PlayerActivity::class.java)
-        intent.putExtra(App.TRACK_DT, Gson().toJson(track))
+        intent.putExtra(App.TRACK_DT, track)
         startActivity(intent)
         trackClickDebounce(track)
     }

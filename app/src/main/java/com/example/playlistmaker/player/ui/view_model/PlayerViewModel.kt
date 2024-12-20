@@ -4,23 +4,50 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.media.domain.api.FavoriteTracksInteractor
 import com.example.playlistmaker.player.domain.api.PlayerInteractor
 import com.example.playlistmaker.player.model.PlayerState
+import com.example.playlistmaker.search.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PlayerViewModel(private val playerInteractor: PlayerInteractor) : ViewModel() {
-
+class PlayerViewModel(
+    private val playerInteractor: PlayerInteractor,
+    private val favoriteTracksInteractor: FavoriteTracksInteractor
+) : ViewModel() {
     private val _playerState = MutableLiveData<PlayerState>()
     val playerState: LiveData<PlayerState> get() = _playerState
+
+    private val _favoriteState = MutableLiveData<Boolean>()
+    val favoriteState: LiveData<Boolean> get() = _favoriteState
 
     private var updateJob: Job? = null
 
     init {
         _playerState.value = PlayerState.Default
+    }
+
+    fun onFavoriteClicked(track: Track) {
+        viewModelScope.launch {
+            val isCurrentlyFavorite = _favoriteState.value ?: false
+            if (isCurrentlyFavorite) {
+                favoriteTracksInteractor.deleteFavoriteTrack(track)
+                _favoriteState.postValue(false)
+            } else {
+                favoriteTracksInteractor.addFavoriteTrack(track)
+                _favoriteState.postValue(true)
+            }
+        }
+    }
+
+    fun loadTrack(track: Track) {
+        viewModelScope.launch {
+            val isTrackFavorite = favoriteTracksInteractor.isTrackFavorite(track.trackId)
+            _favoriteState.postValue(isTrackFavorite)
+        }
     }
 
     fun preparePlayer(url: String?) {
