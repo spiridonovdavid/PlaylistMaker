@@ -224,6 +224,11 @@ class SearchFragment : Fragment() {
         outState.putString(KEY_SEARCH_TEXT, searchText)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.restoreLastState()
+    }
+
     companion object {
         private const val KEY_SEARCH_TEXT = "SEARCH_TEXT"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L

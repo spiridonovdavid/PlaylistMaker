@@ -16,4 +16,14 @@ data class Track (
     val country: String,
     val previewUrl: String?,
     val trackTimestamp: Long = System.currentTimeMillis(),
-): Parcelable
+): Parcelable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Track) return false
+        return trackId == other.trackId
+    }
+
+    override fun hashCode(): Int {
+        return trackId.hashCode()
+    }
+}

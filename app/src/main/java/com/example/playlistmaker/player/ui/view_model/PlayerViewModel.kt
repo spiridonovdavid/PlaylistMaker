@@ -51,15 +51,29 @@ class PlayerViewModel(
     }
 
     fun preparePlayer(url: String?) {
-        url?.let {
-            playerInteractor.preparePlayer(it, onReady = {
-                _playerState.postValue(PlayerState.Prepared)
-            }, onComplete = {
-                stopPositionUpdates()
-                _playerState.postValue(PlayerState.Prepared)
-            })
+        if (url.isNullOrEmpty()) {
+            _playerState.postValue(PlayerState.Default)
+            return
+        }
+
+        try {
+            playerInteractor.preparePlayer(
+                url,
+                onReady = {
+                    _playerState.postValue(PlayerState.Prepared)
+                },
+                onComplete = {
+                    stopPositionUpdates()
+                    _playerState.postValue(PlayerState.Prepared)
+                }
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _playerState.postValue(PlayerState.Default)
         }
     }
+
+
 
     fun startPlayer() {
         playerInteractor.startPlayer()
