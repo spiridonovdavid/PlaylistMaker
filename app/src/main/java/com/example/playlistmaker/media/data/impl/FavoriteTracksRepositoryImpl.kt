@@ -15,7 +15,7 @@ class FavoriteTracksRepositoryImpl(
 ) : FavoriteTracksRepository {
 
     override suspend fun addFavoriteTrack(track: Track) {
-        val trackEntity = trackConverter.map(track)
+        val trackEntity = trackConverter.map(track).copy(trackTimestamp = System.currentTimeMillis())
         appDatabase.trackDao().insertTrack(trackEntity)
     }
 

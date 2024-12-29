@@ -29,8 +29,7 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val isDarkThemeEnabled = viewModel.getThemeSettings().isDarkTheme
-        binding.switchtheme.isChecked = isDarkThemeEnabled
+        binding.switchtheme.isChecked = viewModel.getThemeSettings().isDarkTheme
 
         binding.switchtheme.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateThemeSettings(ThemeSettings(isChecked))

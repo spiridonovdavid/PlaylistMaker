@@ -23,16 +23,15 @@
 
         <LinearLayout
             style="@style/SettingsItem">
-
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchtheme"
                 style="@style/SettingsItemText"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 app:trackTint="@color/switch_one"
                 app:thumbTint="@color/switch_two"
+                app:switchMinWidth="55dp"
                 android:text="@string/theme" />
-
         </LinearLayout>
 
         <LinearLayout

@@ -3,6 +3,7 @@ package com.example.playlistmaker.di
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.room.Room
+import com.example.playlistmaker.media.data.converters.PlaylistDbConverter
 import com.example.playlistmaker.media.db.AppDatabase
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.network.ApiService
@@ -45,6 +46,14 @@ val dataModule = module {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.playlistmaker")
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    single {
+        get<AppDatabase>().trackInPlaylistDao()
+    }
+
+    factory {
+        PlaylistDbConverter()
     }
 
 }
