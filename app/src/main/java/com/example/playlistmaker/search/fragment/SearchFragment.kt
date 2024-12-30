@@ -47,19 +47,17 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        trackClickDebounce = debounce(SEARCH_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) {
+        trackClickDebounce = debounce(SEARCH_DEBOUNCE_DELAY, requireActivity().lifecycleScope, false) {
             viewModel.saveTrackToHistory(it)
         }
 
-        trackSearchDebounce = debounce(CLICK_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) {
+        trackSearchDebounce = debounce(CLICK_DEBOUNCE_DELAY, requireActivity().lifecycleScope, false) {
             viewModel.performSearch(binding.searchInput.text.toString())
         }
 
         trackAdapter = TrackAdapter(
             emptyList(),
-            onTrackClick = { track ->
-                onTrackClick(track)
-            }
+            onTrackClick = { track -> onTrackClick(track) }
         )
 
         binding.trackList.apply {
@@ -169,7 +167,6 @@ class SearchFragment : Fragment() {
         binding.errorLayout.isVisible = true
         binding.errorText.text = getString(messageResId)
         binding.buttonHistoryClear.isVisible = false
-
 
         val errorImageResId = when (messageResId) {
             R.string.error_internet -> R.drawable.error_internet
