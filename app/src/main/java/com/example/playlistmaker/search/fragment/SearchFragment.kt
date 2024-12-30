@@ -21,6 +21,8 @@ import com.example.playlistmaker.search.adapters.TrackAdapter
 import com.example.playlistmaker.search.model.SearchScreenState
 import com.example.playlistmaker.search.view_model.SearchViewModel
 import com.example.playlistmaker.utils.debounce
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -30,10 +32,9 @@ class SearchFragment : Fragment() {
 
     private lateinit var trackAdapter: TrackAdapter
     private var searchText: String = ""
-
-    private lateinit var trackClickDebounce: (Track) -> Unit
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
     private lateinit var trackSearchDebounce: (Unit) -> Unit
-
+    private var isClickAllowed = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,17 +48,21 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        trackClickDebounce = debounce(SEARCH_DEBOUNCE_DELAY, requireActivity().lifecycleScope, false) {
-            viewModel.saveTrackToHistory(it)
-        }
-
-        trackSearchDebounce = debounce(CLICK_DEBOUNCE_DELAY, requireActivity().lifecycleScope, false) {
+        trackSearchDebounce = debounce(SEARCH_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) {
             viewModel.performSearch(binding.searchInput.text.toString())
         }
 
+        onTrackClickDebounce = debounce(CLICK_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) { track ->
+            viewModel.saveTrackToHistory(track)
+            findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track))
+        }
+
+
         trackAdapter = TrackAdapter(
             emptyList(),
-            onTrackClick = { track -> onTrackClick(track) }
+            onTrackClick = { track ->
+                onTrackClickDebounce(track)
+            }
         )
 
         binding.trackList.apply {
@@ -206,11 +211,7 @@ class SearchFragment : Fragment() {
         inputMethodManager.hideSoftInputFromWindow(binding.clearButton.windowToken, 0)
     }
 
-    private fun onTrackClick(track: Track) {
-        trackClickDebounce(track)
-        val action = SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track)
-        findNavController().navigate(action)
-    }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
