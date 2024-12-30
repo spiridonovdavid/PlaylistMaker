@@ -16,13 +16,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
+import com.example.playlistmaker.media.fragment.MediaLibraryFragmentDirections
 import com.example.playlistmaker.search.model.Track
 import com.example.playlistmaker.search.adapters.TrackAdapter
 import com.example.playlistmaker.search.model.SearchScreenState
 import com.example.playlistmaker.search.view_model.SearchViewModel
 import com.example.playlistmaker.utils.debounce
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -32,9 +31,7 @@ class SearchFragment : Fragment() {
 
     private lateinit var trackAdapter: TrackAdapter
     private var searchText: String = ""
-    private lateinit var onTrackClickDebounce: (Track) -> Unit
     private lateinit var trackSearchDebounce: (Unit) -> Unit
-    private var isClickAllowed = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,16 +49,11 @@ class SearchFragment : Fragment() {
             viewModel.performSearch(binding.searchInput.text.toString())
         }
 
-        onTrackClickDebounce = debounce(CLICK_DEBOUNCE_DELAY, viewLifecycleOwner.lifecycleScope, false) { track ->
-            viewModel.saveTrackToHistory(track)
-            findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track))
-        }
-
 
         trackAdapter = TrackAdapter(
             emptyList(),
             onTrackClick = { track ->
-                onTrackClickDebounce(track)
+                onTrackClick(track)
             }
         )
 
@@ -198,6 +190,11 @@ class SearchFragment : Fragment() {
     private fun clearError() {
         binding.errorLayout.isVisible = false
         binding.trackList.isVisible = true
+    }
+
+    private fun onTrackClick(track: Track) {
+        viewModel.saveTrackToHistory(track)
+        findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track))
     }
 
     @SuppressLint("NotifyDataSetChanged")
