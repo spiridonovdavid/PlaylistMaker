@@ -19,4 +19,7 @@
     <color name="ic_inactive_clr">#FFFFFF</color>
     <color name="bottom_nav_background">#1A1B22</color>
     <color name="favoritebg">#FFFFFF</color>
+    <color name="view">#FFFFFF</color>
+    <color name="background">#1A1B22</color>
+    <color name="surface">#FFFFFF</color>
 </resources>

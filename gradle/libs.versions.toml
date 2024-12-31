@@ -16,7 +16,7 @@ convertergson = "2.9.0"
 parcelize = "2.0.20-Beta2"
 koin = "3.5.0"
 fragment = "1.8.4"
-navigation = "2.8.3"
+navigation = "2.8.5"
 coroutines = "1.7.3"
 room = "2.6.1"
 
@@ -50,4 +50,5 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.android", version.ref = "parcelize" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
 
